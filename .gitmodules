@@ -1,6 +1,3 @@
-[submodule "nos"]
-	path = nos
-	url = git@github.com:savipauk/nos.git
 [submodule "srsv"]
 	path = srsv
 	url = git@github.com:savipauk/srsv.git
