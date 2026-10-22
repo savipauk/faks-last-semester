@@ -1,0 +1,118 @@
+2.1
+
+delta(h2) <  delta(h1)
+---------------------------
+delta(h) = E(h|Dtest) - E(h|Dtrain)
+E(h2|Dtest) - E(h2|Dtrain) < E(h1|Dtest) - E(h1|Dtrain)
+
+Facts:
+E(h2|Dtrain) < E(h1|Dtrain)
+
+Ako:
+A) E(h2|Dtest) > E(h1|Dtest)
+-> h2 ne valja i h2 je prenaucen
+
+B) E(h1|Dtest) > E(h2|Dtest)
+-> ok. ne znamo nikaj
+
+C) E(h2|Dtrain) < E(h1|Dtrain)
+-> ok. ne znamo nikaj
+
+D) E(h1|Dtrain) < E(h2|Dtrain)
+-> prema definiciji NE
+
+2.1: A
+
+
+2.2
+
+o = theta from R^3
+H1: h1(x; o) = 1{o^T * x >= 0}; x,o vektori
+H2: h2(x; o) = 1{(x1 - o1)^2 + (x2 - o2)^2 >= o0^2}; x,o vektori
+
+H3: H1 U H2
+H4: h4(x; o) = h1(x) * h2(x); x,o vektori
+
+Ek = min(h from Hk, E(h|D))
+
+Koji odnosi vrijede izmedu minimalnih empirijiskh pogresaka ovih modela?
+
+D = {(xi, yi)}i = {
+  ((0 , 0 ), 0),
+  ((0 , 2 ), 0),
+  ((0 , -1), 0),
+  ((-1, 0 ), 1),
+  ((0 , 1 ), 1),
+  ((1 , 0 ), 1)
+}
+
+Nacrtaj tockice i kruznice
+
+
+
+3.1
+
+Model jednostavne regresije, h(x; w0, w1) = w0 + w1x
+
+Funkcija gubitka L(y, h(x)) = (y + h(x))^2
+                                 ^ umjesto -, tu je +
+
+Treniramo model na skupu primjera cije su oznake uzorkovane iz distribucije
+N(-1 + 2x, o^2), gdje je o^2 razmjerno malena (nema mnogo suma).
+
+Koji vektor tezina (wo, w1) ocekujemo priblizno dobiti kao rezultat najmanjih
+kvadrata?
+
+argmin E(w|D) ?
+  w
+
+zemi x = 0 , 1, 2, 3
+  -> y = -1, 1, 3, 5
+
+trebamo samo dva primjera
+-> (0, -1); (1, 1)
+
+E(w|D) = 1/2 sum (y + h(x))^2
+
+gledi rjesenja
+(w0, w1)
+(1 , -2) A
+-> dobimo
+E(w|D) = 1/2 sum (y + w0 + w1x)^2
+
+(-1 + 1 + 0)^2 + (1 + 1 -2)^2 = 0
+
+A) (w0, w1) = (1, -2) daje E(w|D) = 0
+
+(2,-1) B
+(-1 + 2)^2 + (1 + 2 - 1)^2 > 0, nije B)
+B) > 0
+
+(-1, 2) C
+(-1 - 1)^2 + ...
+
+
+3.2
+
+D = {(xi, yi)} = {
+  (0,0)
+  (2,0)
+  (3,2)
+  (5,2)
+}
+
+Li = L(yi, h(xi)) = (yi - h(xi))^2
+                  = (yi - w0 - w1xi)^2
+
+prvo dobis w0 i w1 s onim formulama usranima i unda
+
+L1 = (-w0)^2 = w0^2
+L2 = (-w0 - 2w1)^2 = w0^2 + 4w0w1 + 4w1^2
+L3 = (2 - w0 - 3w1)(2 - w0 - 3w1) = 4 - 2w0 - 6w1 - 2w0 + w0^2 + 3w0w1 - 6w1 - 3w0w1 + 9w1^2
+                                  = 4 - 4w0 - 12w1 - 6w0w1 + w0^2 + 9w1^2
+L4 = (2 - w0 - 5w1)^2 = ...
+
+like wut
+
+4.1.
+
