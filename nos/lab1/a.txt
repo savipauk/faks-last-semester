@@ -1,0 +1,6 @@
+ipcrm -q 131072 
+ipcrm -q 131073
+ipcrm -q 131074
+ipcrm -q 131075
+ipcrm -q 131076
+ipcrm -q 131077

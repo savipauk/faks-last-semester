@@ -20,7 +20,6 @@ long msg_type_wheel = 2;
 
 void ringispil(int queue_id) {
   int unfinished = 8;
-  printf("ringispil\n");
 
   while (unfinished != 0) {
     for (int i = 0; i < 4;) {
@@ -31,6 +30,7 @@ void ringispil(int queue_id) {
       switch (msg_rcv.msg) {
       case HELLO: {
         // visitor says hello, we need 4 visitors to start a ride
+        printf("dobio hello\n");
         i++;
         break;
       }
@@ -50,8 +50,9 @@ void ringispil(int queue_id) {
 
     msg_buf msg_snd = {msg_type_wheel, SIT};
     msgsnd(queue_id, &msg_snd, sizeof(msg_snd) - sizeof(long), 0);
-    return;
+    printf("unfinished %d\n", unfinished);
   }
+  printf("GOTOV\n");
 }
 
 void visitor(int id, int queue_id) {
@@ -63,16 +64,29 @@ void visitor(int id, int queue_id) {
   for (size_t i = 0; i < 2; ++i) {
     int r = 100 + (rand() % 1900);
     usleep(r * 1000);
-    // send_msg("zelim se voziti")
-    if (/*reply is Sjedni*/ 1) {
+    printf("dobio hello\n");
+    msg_buf msg_snd = {msg_type_visitor, HELLO};
+    msgsnd(queue_id, &msg_snd, sizeof(msg_snd) - sizeof(long), 0);
+
+    msg_buf msg_rcv;
+    msgrcv(queue_id, &msg_rcv, sizeof(msg_rcv) - sizeof(long), msg_type_wheel,
+           0);
+
+    if (msg_rcv.msg == SIT) {
       printf("Sjeo posjetitelj %d\n", id);
     }
 
-    if (/*reply is Ustani*/ 1) {
+    msgrcv(queue_id, &msg_rcv, sizeof(msg_rcv) - sizeof(long), msg_type_wheel,
+           0);
+    if (msg_rcv.msg == ARISE) {
       printf("Ustao posjetitelj %d\n", id);
+      msg_buf msg_snd = {msg_type_visitor, LEFT};
+      msgsnd(queue_id, &msg_snd, sizeof(msg_snd) - sizeof(long), 0);
     }
   }
-  // send_msg("posjetitelj id zavrsio")
+
+  msg_buf msg_snd = {msg_type_visitor, BYE};
+  msgsnd(queue_id, &msg_snd, sizeof(msg_snd) - sizeof(long), 0);
   printf("Posjetitelj %d zavrsio\n", id);
 }
 
@@ -96,7 +110,7 @@ int main() {
   }
 
   if (id == 0) {
-    usleep(5000 * 1000);
+    // usleep(5000 * 1000);
     ringispil(queue_id);
   } else {
     visitor(id, queue_id);
