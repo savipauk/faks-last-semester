@@ -1,0 +1,51 @@
+Zadatak
+
+Modelirati vrtuljak (ringišpil) s dva tipa procesa: procesima posjetitelj (koje predstavljaju posjetitelje koji žele na vožnju) te jednim procesom vrtuljak. Vrtuljak ima 4 sjedeća mjesta. Procesima posjetitelj se ne smije dozvoliti ukrcati na vrtuljak kada više nema praznih mjesta te prije nego li svi prethodni posjetitelji siđu. Vrtuljak se može pokrenuti tek kada je pun. Na početku glavni proces, koji ujedno predstavlja proces vrtuljak, stvara 8 procesa posjetitelja. Procesi međusobno komuniciraju uz pomoć reda poruka.
+
+Ispravno sinkronizirati 8 procesa posjetitelja i jednog procesa vrtuljak koristeći Lamportov raspodijeljeni protokol.
+
+Sve što u zadatku nije zadano, riješiti na proizvoljan način.
+
+ 
+
+Dretva posjetitelj(K) {
+
+   ponavljaj 2 puta{
+
+      spavaj X milisekundi; // X je slučajan broj između 100 i 2000
+
+      pošalji vrtuljku poruku "Želim se voziti";
+
+      po primitku poruke "Sjedi" sjedni, ispiši "Sjeo posjetitelj K" i čekaj;
+
+      po primitku poruke "Ustani" ustani, siđi i ispiši "Sišao posjetitelj K";
+
+   }
+
+   ispiši i pošalji poruku vrtuljku "Posjetitelj K završio."
+
+}
+ 
+
+Dretva vrtuljak() {
+
+   dok ima posjetitelja {
+
+      čekaj posjetitelje da zažele vožnju {
+
+          čekaj 4 poruke "Želim se voziti";
+
+          odgovori na svaku poruku porukom "Sjedi";
+
+      }
+
+      pokreni vrtuljak i ispiši "Pokrenuo vrtuljak";
+
+      spavaj X milisekundi; // X je slučajan broj između 1000 i 3000
+
+      zaustavi vrtuljak i ispiši "Vrtuljak zaustavljen";
+      pošalji posjetiteljima na vrtuljku poruku "Ustani"
+
+   }
+
+}
