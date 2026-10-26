@@ -19,23 +19,62 @@ typedef struct {
 // global
 int queue_id;
 int my_id;
-int locaL_clock = 0;
+int local_clock = 0;
 
 int waiting_queue[9];
+int replied[9];
 
 // visitor
 int sitting = 0;
 
 // ringispil
 
-
-void enter_critical() {
-
-}
-
+void enter_critical();
 void exit_critical();
 void send_hello_to_ringispil();
 void read_one_message();
+int can_enter();
+
+void enter_critical() {
+  local_clock++;
+  waiting_queue[my_id] = local_clock;
+
+  for (int i = 0; i < 9; i++) {
+    replied[i] = 0;
+  }
+
+  while (!can_enter()) {
+    read_one_message();
+  }
+}
+
+// moj zahtjev je prvi, svi ostali su odgovorili
+int can_enter() {
+  int smallest = waiting_queue[my_id];
+  int id = my_id;
+
+  for (int i = 0; i < 9; i++) {
+    if (i == my_id) {
+      continue;
+    }
+
+    if (replied[i] == 0) {
+      return 0;
+    }
+
+    int other_clock = waiting_queue[i];
+    if (waiting_queue[i] != -1 && (smallest == -1 || other_clock < smallest)) {
+      smallest = other_clock;
+      id = i;
+    }
+  }
+
+  if (id == my_id) {
+    return 1;
+  }
+
+  return 0;
+}
 
 void ringispil() {
   srand(time(NULL) ^ getpid());
