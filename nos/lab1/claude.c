@@ -13,29 +13,29 @@
 typedef enum { HELLO = 1, SIT, ARISE, LEFT, BYE, REQEUST, REPLY, EXIT } Message;
 
 typedef struct {
-  long type; // primatelj: id + 1 (mtype mora biti > 0)
+  long type;  // primatelj: id + 1 (mtype mora biti > 0)
   Message msg;
   int sender;
   int clock;
-} msg_buf;
+} msg_buffer;
 
 // nakon fork() svaki proces ima svoju kopiju ovoga
 int queue_id;
 int my_id;
 int lclock = 0;
 
-int req_ts[N];  // vremenska oznaka zahtjeva procesa j, -1 ako ga nema
-int replied[N]; // je li proces j odgovorio na moj zahtjev
-int done[N];    // je li proces j zavrsio (ne odgovara vise)
+int req_ts[N];   // vremenska oznaka zahtjeva procesa j, -1 ako ga nema
+int replied[N];  // je li proces j odgovorio na moj zahtjev
+int done[N];     // je li proces j zavrsio (ne odgovara vise)
 
-int hello_from = -1; // vrtuljak: tko je poslao HELLO
-int left_count = 0;  // vrtuljak: koliko ih je sislo
-int bye_count = 0;   // vrtuljak: koliko ih je zavrsilo
-int got_sit = 0;     // posjetitelj
-int got_arise = 0;   // posjetitelj
+int hello_from = -1;  // vrtuljak: tko je poslao HELLO
+int left_count = 0;   // vrtuljak: koliko ih je sislo
+int bye_count = 0;    // vrtuljak: koliko ih je zavrsilo
+int got_sit = 0;      // posjetitelj
+int got_arise = 0;    // posjetitelj
 
 void send_to(int to, Message msg, int clock) {
-  msg_buf msg_snd = {to + 1, msg, my_id, clock};
+  msg_buffer msg_snd = {to + 1, msg, my_id, clock};
   msgsnd(queue_id, &msg_snd, sizeof(msg_snd) - sizeof(long), 0);
 }
 
@@ -49,7 +49,7 @@ void send_to_all(Message msg, int clock) {
 
 // primi jednu poruku iz svog sanducica i obradi je
 void receive_one() {
-  msg_buf msg_rcv;
+  msg_buffer msg_rcv;
   msgrcv(queue_id, &msg_rcv, sizeof(msg_rcv) - sizeof(long), my_id + 1, 0);
 
   // uskladi lokalni sat
@@ -59,32 +59,32 @@ void receive_one() {
   lclock++;
 
   switch (msg_rcv.msg) {
-  case REQEUST:
-    req_ts[msg_rcv.sender] = msg_rcv.clock;
-    send_to(msg_rcv.sender, REPLY, lclock);
-    break;
-  case REPLY:
-    replied[msg_rcv.sender] = 1;
-    break;
-  case EXIT:
-    req_ts[msg_rcv.sender] = -1;
-    break;
-  case HELLO:
-    hello_from = msg_rcv.sender;
-    break;
-  case SIT:
-    got_sit = 1;
-    break;
-  case ARISE:
-    got_arise = 1;
-    break;
-  case LEFT:
-    left_count++;
-    break;
-  case BYE:
-    done[msg_rcv.sender] = 1;
-    bye_count++;
-    break;
+    case REQEUST:
+      req_ts[msg_rcv.sender] = msg_rcv.clock;
+      send_to(msg_rcv.sender, REPLY, lclock);
+      break;
+    case REPLY:
+      replied[msg_rcv.sender] = 1;
+      break;
+    case EXIT:
+      req_ts[msg_rcv.sender] = -1;
+      break;
+    case HELLO:
+      hello_from = msg_rcv.sender;
+      break;
+    case SIT:
+      got_sit = 1;
+      break;
+    case ARISE:
+      got_arise = 1;
+      break;
+    case LEFT:
+      left_count++;
+      break;
+    case BYE:
+      done[msg_rcv.sender] = 1;
+      bye_count++;
+      break;
   }
 }
 
