@@ -1,0 +1,20 @@
+Sinkronizacija procesa u simuliranom raspodijeljenom okruženju
+Zadatak
+
+Simulirati raspodijeljeni sustav na jednom računalu koristeći procese koji međusobno komuniciraju običnim cjevovodima.
+U takvom simuliranom raspodijeljenom okruženju riješiti proizvoljan sinkronizacijski problem, primjerice problem N filozofa ili osmisliti bilo koji sinkronizacijski problem s najmanje 4 procesa i sinkronizirati ih koristeći protokol Ricarta i Agrawala.
+
+Svi procesi ispisuju poruku koju šalju i poruku koju primaju.
+
+Sve što u zadatku nije zadano, riješiti na proizvoljan način.
+ 
+Primjer sinkronizacijskog problema: Problem N filozofa
+
+Na nekoj konferenciji okupilo se N  filozofa. Za razliku od poznatog slučaja 5 filozofa, ovdje za stolom ima mjesta samo za jednu osobu, a ne za 5. Dakle, pristup stolu je kritični odsječak jer samo jedan filozof može biti u nekom trenutku za stolom ili je stol prazan. Na početku glavni proces stvara N procesa filozofa (broj N se zadaje i može biti u intervalu [3,10]. Procesi međusobno komuniciraju cjevovodima (svejedno: običnim ili imenovanim cjevovodima).
+
+proces filozof(i){
+   sudjeluj na konferenciji; // spavaj X milisekundi gdje je X je slučajan broj između 100 i 2000;
+   pristupi stolu, jedi i ispiši "Filozof i je za stolom";    // spavaj 3 sekunde; (kritični odsječak)
+   sudjeluj na konferenciji; // spavaj X milisekundi gdje je X je slučajan broj između 100 i 2000;
+}
+
