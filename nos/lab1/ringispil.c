@@ -7,8 +7,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#define PAYLOAD_SIZE 16
-
 typedef enum { HELLO = 1, SIT, ARISE, LEFT, BYE, REQUEST, REPLY, EXIT } Message;
 
 typedef struct {
@@ -33,7 +31,9 @@ int got_sit = 0;
 int got_arise = 0;
 
 // ringispil
+int hello_from = -1;
 int bye_count = 0;
+int left_count = 0;
 
 void enter_critical();
 void exit_critical();
@@ -72,12 +72,13 @@ int can_enter() {
       continue;
     }
 
-    if (replied[i] == 0) {
+    if (replied[i] == 0 && done[i] == 0) {
       return 0;
     }
 
     int other_clock = waiting_queue[i];
-    if (waiting_queue[i] != -1 && (smallest == -1 || other_clock < smallest)) {
+    if (other_clock != -1 &&
+        (other_clock < smallest || (other_clock == smallest && i < id))) {
       smallest = other_clock;
       id = i;
     }
@@ -101,7 +102,7 @@ void send_to_all(Message msg, int clock) {
       continue;
     }
 
-    send_message(i, msg, local_clock);
+    send_message(i, msg, clock);
   }
 }
 
@@ -115,7 +116,11 @@ void read_one_message() {
   local_clock++;
 
   switch (msg_rcv.msg) {
-    case HELLO:
+    case HELLO: {
+      hello_from = msg_rcv.sender;
+      break;
+    }
+
     case SIT: {
       if (msg_rcv.sender == 0) {
         got_sit = 1;
@@ -134,7 +139,14 @@ void read_one_message() {
       break;
     }
 
+    case LEFT: {
+      left_count++;
+      break;
+    }
+
     case BYE: {
+      bye_count++;
+      done[msg_rcv.sender] = 1;
       break;
     }
 
@@ -164,14 +176,23 @@ void ringispil() {
   int total_visitors = 0;
 
   while (total_visitors < 16) {
-    for (int i = 0; i < 4; i++) {
-      msg_buf msg_rcv;
-      msgrcv(queue_id, &msg_rcv, sizeof(msg_rcv) - sizeof(long), (long)HELLO,
-             0);
-      printf("dobio hello\n");
+    int seated[4];
 
-      msg_buf msg_snd = {(long)SIT, SIT};
-      msgsnd(queue_id, &msg_snd, sizeof(msg_snd) - sizeof(long), 0);
+    for (int i = 0; i < 4; i++) {
+      while (hello_from == -1) {
+        read_one_message();
+      }
+      // printf("dobio hello od %d\n", hello_from);
+
+      seated[i] = hello_from;
+      send_message(hello_from, SIT, local_clock);
+      hello_from = -1;
+    }
+
+    // zadnji posjetitelj salje exit tek nakon sto je sjeo
+    // idu jedan po jedan pa moze ovako
+    while (waiting_queue[seated[3]] != -1) {
+      read_one_message();
     }
 
     printf("pokrenuo ringispil\n");
@@ -181,10 +202,20 @@ void ringispil() {
     usleep(r * 1000);
 
     printf("zavrsio ringispil\n");
+
+    left_count = 0;
     for (int i = 0; i < 4; i++) {
-      msg_buf msg_snd = {(long)ARISE, ARISE};
-      msgsnd(queue_id, &msg_snd, sizeof(msg_snd) - sizeof(long), 0);
+      send_message(seated[i], ARISE, local_clock);
     }
+
+    // nema sjedanja prije neg svi odu
+    while (left_count < 4) {
+      read_one_message();
+    }
+  }
+
+  while (bye_count < 8) {
+    read_one_message();
   }
   printf("GOTOV\n");
 }
@@ -198,7 +229,7 @@ void visitor() {
   for (size_t i = 0; i < 2; ++i) {
     int r = 100 + (rand() % 1900);
     usleep(r * 1000);
-    printf("zelim se voziti\n");
+    printf("zelim se voziti %d\n", my_id);
 
     // critical section
     {
@@ -219,7 +250,6 @@ void visitor() {
     }
 
     printf("ustao posjetitelj %d\n", my_id);
-
     send_message(0, LEFT, local_clock);
   }
 
