@@ -1,0 +1,12 @@
+MI 2024
+Kaj ce klijent poslat na server ako mu klijent upise:
+Url koji pocinje s http, s ftp, s apuw i bez icega
+Kak ce klijent prikazat odg ako je body html a content-type:
+Html, plain, xml, json
+Dva ista jsona al jedan je u navodnicima, koja je razlika i sta treba nap da se podacima moze pristupat s npr p.firstname
+hrpa izjava sta se azurira kojom metodom pa sigurnost i idempotencija
+Imate 3 podatka
+D1 se moze dohvatit
+D2 dohvatit i obrisat
+D3 dohvatit, odrisat i stvorit
+Pita da napisemo REST elemente za razinu 0, 1 i 2 
