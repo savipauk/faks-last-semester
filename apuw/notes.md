@@ -46,6 +46,20 @@ Postoje **četiri arhetipa resursa**:
 - **405 Method Not Allowed** - metoda nije podržana.
 - **500 Internal Server Error** - greška servera.
 
+200 OK - uspjeh opcenito
+201 Created - uspjesno kreiranje resursa
+202 accepted - pocetak asinkrone akcije (websocket)?
+204 no content - no body
+301 moved permanently
+304 not modified??
+307 temporary redirect
+400 bad request -> glup si
+401 unauthorized
+403 forbidden -> slabe privilegije
+404 not found
+405 method not allowed (get a ne postoji)
+500 internal server errror
+
 ## Metadata dizajn
 - **Content-Type** - specificira tip podataka.
 - **Content-Length** - veličina tijela u bajtovima.
